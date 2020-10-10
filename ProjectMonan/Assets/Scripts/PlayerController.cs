@@ -1,57 +1,75 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
+    public Transform groundCheck;
+    public float groundRadius = 0.1f;
+    public LayerMask groundLayer;
+    private bool grounded;
 
-    private Rigidbody2D body;
+    [SerializeField]
+    private float walkSpeed;
+    private Rigidbody2D rb;
+    private Vector2 newMovement;
 
-    private Animator animator;
+    private bool facingRight = true;
+    private bool jump;
+    private float jumpForce = 550;
 
-    private SpriteRenderer sprite;
+    private PlayerAnimation playerAnimation;
 
-    public float runSpeed = 10;
-
-    public CircleCollider2D foot;
-
-    public LayerMask ground;
-
-    public float jumpForce = 20;
+    private void Awake() {
+        rb = GetComponent<Rigidbody2D>();
+        playerAnimation = GetComponent<PlayerAnimation>();
+    }
 
     // Start is called before the first frame update
-    void Start()
-    {
-        body = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        sprite = GetComponent<SpriteRenderer>();
+    void Start(){
+        
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        GetForwardInput();
-        GetJumpInput();
+    void Update(){
+        grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
 
-    private void GetJumpInput()
-    {
-        if(Input.GetButtonDown("Jump") && foot.IsTouchingLayers(ground)) {
-            body.AddForce(Vector2.up * jumpForce);
+    private void FixedUpdate(){
+        rb.velocity = newMovement;
+        
+        if(jump){
+            jump = false;
+            rb.velocity = Vector2.zero;
+            rb.AddForce(Vector2.up * jumpForce);
         }
-        animator.SetBool("isOnGround", foot.IsTouchingLayers(ground));
     }
 
-    private void GetForwardInput()
+    public void Jump()
     {
-      body.velocity = new Vector2(Input.GetAxis("Horizontal")*runSpeed, body.velocity.y);
-      animator.SetFloat("xSpeed", Math.Abs(body.velocity.x));
-      if(!sprite.flipX && body.velocity.x < 0) {
-          sprite.flipX = true;
-      } else if(sprite.flipX && body.velocity.x > 0) {
-          sprite.flipX = false;
-      }
-     
+        if(grounded){
+            jump = true;   
+        }
     }
+
+    public void Move(float direction){
+        float currentSpeed = walkSpeed;
+        newMovement = new Vector2(direction*currentSpeed, rb.velocity.y);
+
+        playerAnimation.SetSpeed((int)Mathf.Abs(direction));
+
+        if(facingRight && direction < 0){
+            Flip();
+        }
+        else if(!facingRight && direction > 0){
+            Flip();
+        }
+    }
+
+    void Flip(){
+        facingRight = !facingRight;
+        transform.Rotate(0,180,0);
+    }
+
 }

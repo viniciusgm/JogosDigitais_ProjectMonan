@@ -13,7 +13,7 @@ TagManager:
   - UI
   - 
   - 
-  - Platforms
+  - Ground
   - 
   - 
   - 
@@ -42,11 +42,11 @@ TagManager:
     uniqueID: 0
     locked: 0
   - name: Background
-    uniqueID: 1806610133
+    uniqueID: 4121171239
     locked: 0
-  - name: Platforms
-    uniqueID: 4175622555
+  - name: Midground
+    uniqueID: 2510185675
     locked: 0
-  - name: Player
-    uniqueID: 2039034973
+  - name: Foreground
+    uniqueID: 3797858571
     locked: 0
